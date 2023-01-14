@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: kind-test
+  name: tomcat
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - pathType: Prefix
+        path: /tomcat
+        backend:
+          service:
+            name: tomcat
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - localhost
+    secretName: tomcat-ingress-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: kind-test
+  name: http-https-echo
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - pathType: Prefix
+        path: /echo
+        backend:
+          service:
+            name: http-https-echo
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - localhost
+    secretName: http-https-echo-ingress-cert
